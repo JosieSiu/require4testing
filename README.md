@@ -36,8 +36,17 @@ Testläufen und Testergebnissen.
 
 Unter Windows:
 
-```powershell
-.\mvnw.cmd spring-boot:run
+`.\mvnw.cmd spring-boot:run`
+
+Anschließend ist die Anwendung erreichbar unter:
+
+`http://localhost:8080/requirements`
+
+## Projekt bauen
+
+`.\mvnw.cmd clean package`
+
+Die erzeugte JAR-Datei befindet sich anschließend im Ordner `target`.
 
 ## Datenbank
 
