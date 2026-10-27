@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testläufe | Require4Testing</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <div>
+            <a class="brand" th:href="@{/requirements}">
+                Require4Testing
+            </a>
+            <span class="subtitle">Testmanagement-Prototyp</span>
+        </div>
+
+        <nav class="main-nav" aria-label="Hauptnavigation">
+            <a th:href="@{/requirements}">
+                Anforderungen
+            </a>
+            <a th:href="@{/test-cases}">
+                Testfälle
+            </a>
+            <a class="active" th:href="@{/test-runs}">
+                Testläufe
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container page-content">
+    <section class="page-heading">
+        <p class="eyebrow">User Story 2</p>
+        <h1>Testläufe verwalten</h1>
+        <p>
+            Neue Testläufe erstellen und vorhandene Testläufe einsehen.
+        </p>
+    </section>
+
+    <div class="content-grid">
+        <section class="card">
+            <h2>Neuen Testlauf erstellen</h2>
+
+            <form th:action="@{/test-runs}"
+                  th:object="${testRun}"
+                  method="post">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+
+                    <input id="name"
+                           type="text"
+                           th:field="*{name}"
+                           maxlength="120"
+                           required>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('name')}"
+                       th:errors="*{name}">
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Beschreibung</label>
+
+                    <textarea id="description"
+                              th:field="*{description}"
+                              maxlength="2000"
+                              rows="6"
+                              required>
+                    </textarea>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('description')}"
+                       th:errors="*{description}">
+                    </p>
+                </div>
+
+                <button class="button" type="submit">
+                    Testlauf speichern
+                </button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Gespeicherte Testläufe</h2>
+
+            <p class="empty-state"
+               th:if="${#lists.isEmpty(testRuns)}">
+                Es wurden noch keine Testläufe erstellt.
+            </p>
+
+            <div class="table-wrapper"
+                 th:unless="${#lists.isEmpty(testRuns)}">
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Beschreibung</th>
+                        <th>Testperson</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="item : ${testRuns}">
+                        <td th:text="${item.id}"></td>
+                        <td th:text="${item.name}"></td>
+                        <td th:text="${item.description}"></td>
+                        <td>
+                            <span th:if="${item.testerName == null
+                                    or #strings.isEmpty(item.testerName)}">
+                                Noch nicht zugeordnet
+                            </span>
+
+                            <span th:unless="${item.testerName == null
+                                    or #strings.isEmpty(item.testerName)}"
+                                  th:text="${item.testerName}">
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="button-secondary"
+                                   th:href="@{/test-runs/{id}/assign(id=${item.id})}">
+                                    Zuordnung
+                                </a>
+
+                                <a class="button-secondary"
+                                   th:href="@{/test-runs/{id}/results(id=${item.id})}">
+                                    Ergebnisse erfassen
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Require4Testing – Prototyp zur Verwaltung von Softwaretests
+    </div>
+</footer>
+</body>
+</html>

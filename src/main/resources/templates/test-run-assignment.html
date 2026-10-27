@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Testfälle zuordnen | Require4Testing</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css(v=6)}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <div>
+            <a class="brand"
+               th:href="@{/requirements}">
+                Require4Testing
+            </a>
+
+            <span class="subtitle">
+                Testmanagement-Prototyp
+            </span>
+        </div>
+
+        <nav class="main-nav"
+             aria-label="Hauptnavigation">
+
+            <a th:href="@{/requirements}">
+                Anforderungen
+            </a>
+
+            <a th:href="@{/test-cases}">
+                Testfälle
+            </a>
+
+            <a class="active"
+               th:href="@{/test-runs}">
+                Testläufe
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container page-content">
+
+    <section class="page-heading">
+        <p class="eyebrow">User Story 4</p>
+
+        <h1>Testfälle zuordnen</h1>
+
+        <p>
+            Eine testende Person und mehrere Testfälle
+            einem Testlauf zuordnen.
+        </p>
+    </section>
+
+    <div class="content-grid">
+
+        <section class="card">
+            <h2>Ausgewählter Testlauf</h2>
+
+            <dl class="details-list">
+                <dt>ID</dt>
+                <dd th:text="${testRun.id}">1</dd>
+
+                <dt>Name</dt>
+                <dd th:text="${testRun.name}">
+                    Testlaufname
+                </dd>
+
+                <dt>Beschreibung</dt>
+                <dd th:text="${testRun.description}">
+                    Beschreibung
+                </dd>
+
+                <dt>Testperson</dt>
+                <dd>
+                    <span th:if="${testRun.testerName == null
+                            or #strings.isEmpty(testRun.testerName)}">
+                        Noch nicht zugeordnet
+                    </span>
+
+                    <span th:unless="${testRun.testerName == null
+                            or #strings.isEmpty(testRun.testerName)}"
+                          th:text="${testRun.testerName}">
+                    </span>
+                </dd>
+            </dl>
+        </section>
+
+        <section class="card">
+            <h2>Zuordnung bearbeiten</h2>
+
+            <p>
+                Trage die testende Person ein und wähle
+                mindestens einen Testfall aus.
+            </p>
+
+            <div class="notice notice-success"
+                 th:if="${success}">
+                Die Zuordnung wurde erfolgreich gespeichert.
+            </div>
+
+            <div class="notice notice-error"
+                 th:if="${assignmentError != null}"
+                 th:text="${assignmentError}">
+                Fehlermeldung
+            </div>
+
+            <form method="post"
+                  th:action="@{/test-runs/{id}/assign(
+                      id=${testRun.id}
+                  )}">
+
+                <div class="form-group">
+                    <label for="testerName">
+                        Testende Person
+                    </label>
+
+                    <input id="testerName"
+                           name="testerName"
+                           type="text"
+                           maxlength="120"
+                           required
+                           th:value="${testerName}"
+                           placeholder="Vor- und Nachname">
+                </div>
+
+                <div class="form-group">
+                    <span class="field-label">
+                        Verfügbare Testfälle
+                    </span>
+
+                    <p class="empty-state"
+                       th:if="${#lists.isEmpty(testCases)}">
+                        Es wurden noch keine Testfälle angelegt.
+                    </p>
+
+                    <div class="checkbox-list"
+                         th:unless="${#lists.isEmpty(testCases)}">
+
+                        <label class="checkbox-item"
+                               th:each="testCase : ${testCases}">
+
+                            <input type="checkbox"
+                                   name="testCaseIds"
+                                   th:value="${testCase.id}"
+                                   th:checked="${#lists.contains(
+                                       selectedTestCaseIds,
+                                       testCase.id
+                                   )}">
+
+                            <span class="checkbox-copy">
+                                <span class="checkbox-title"
+                                      th:text="${testCase.title}">
+                                    Testfalltitel
+                                </span>
+
+                                <span class="checkbox-meta">
+                                    Anforderung:
+                                    <span th:text="${
+                                        testCase.requirement.title
+                                    }">
+                                        Anforderungstitel
+                                    </span>
+                                </span>
+                            </span>
+                        </label>
+
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="button"
+                            type="submit"
+                            th:disabled="${
+                                #lists.isEmpty(testCases)
+                            }">
+                        Zuordnung speichern
+                    </button>
+
+                    <a class="button-secondary"
+                       th:href="@{/test-runs}">
+                        Zurück zu den Testläufen
+                    </a>
+                </div>
+
+            </form>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Require4Testing – Prototyp zur Verwaltung von Softwaretests
+    </div>
+</footer>
+
+</body>
+</html>

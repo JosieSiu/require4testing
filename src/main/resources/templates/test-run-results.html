@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Testergebnisse | Require4Testing</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css(v=7)}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <div>
+            <a class="brand"
+               th:href="@{/requirements}">
+                Require4Testing
+            </a>
+
+            <span class="subtitle">
+                Testmanagement-Prototyp
+            </span>
+        </div>
+
+        <nav class="main-nav"
+             aria-label="Hauptnavigation">
+
+            <a th:href="@{/requirements}">
+                Anforderungen
+            </a>
+
+            <a th:href="@{/test-cases}">
+                Testfälle
+            </a>
+
+            <a class="active"
+               th:href="@{/test-runs}">
+                Testläufe
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container page-content">
+
+    <section class="page-heading">
+        <p class="eyebrow">User Story 5</p>
+
+        <h1>Testergebnisse erfassen</h1>
+
+        <p>
+            Ergebnisse der zugeordneten Testfälle dokumentieren.
+        </p>
+    </section>
+
+    <div class="content-grid">
+
+        <section class="card">
+            <h2>Ausgewählter Testlauf</h2>
+
+            <dl class="details-list">
+                <dt>ID</dt>
+                <dd th:text="${testRun.id}">1</dd>
+
+                <dt>Name</dt>
+                <dd th:text="${testRun.name}">
+                    Testlaufname
+                </dd>
+
+                <dt>Beschreibung</dt>
+                <dd th:text="${testRun.description}">
+                    Beschreibung
+                </dd>
+
+                <dt>Testperson</dt>
+                <dd>
+                    <span th:if="${testRun.testerName == null
+                            or #strings.isEmpty(testRun.testerName)}">
+                        Noch nicht zugeordnet
+                    </span>
+
+                    <span th:unless="${testRun.testerName == null
+                            or #strings.isEmpty(testRun.testerName)}"
+                          th:text="${testRun.testerName}">
+                    </span>
+                </dd>
+            </dl>
+
+            <div class="form-actions">
+                <a class="button-secondary"
+                   th:href="@{/test-runs/{id}/assign(
+                       id=${testRun.id}
+                   )}">
+                    Zuordnung bearbeiten
+                </a>
+
+                <a class="button-secondary"
+                   th:href="@{/test-runs}">
+                    Zurück
+                </a>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Zugeordnete Testfälle</h2>
+
+            <div class="notice notice-success"
+                 th:if="${success}">
+                Das Testergebnis wurde erfolgreich gespeichert.
+            </div>
+
+            <div class="notice notice-error"
+                 th:if="${resultError != null}"
+                 th:text="${resultError}">
+                Fehlermeldung
+            </div>
+
+            <div th:if="${#lists.isEmpty(executions)}">
+                <p class="empty-state">
+                    Diesem Testlauf wurden noch keine Testfälle
+                    zugeordnet.
+                </p>
+
+                <a class="button-secondary"
+                   th:href="@{/test-runs/{id}/assign(
+                       id=${testRun.id}
+                   )}">
+                    Testfälle zuordnen
+                </a>
+            </div>
+
+            <div class="result-list"
+                 th:unless="${#lists.isEmpty(executions)}">
+
+                <article class="result-entry"
+                         th:each="execution : ${executions}">
+
+                    <h3 th:text="${execution.testCase.title}">
+                        Testfalltitel
+                    </h3>
+
+                    <p class="result-context">
+                        Anforderung:
+                        <strong th:text="${
+                            execution.testCase.requirement.title
+                        }">
+                            Anforderungstitel
+                        </strong>
+                    </p>
+
+                    <div class="expected-result">
+                        <strong>Erwartetes Ergebnis</strong>
+
+                        <span th:text="${
+                            execution.testCase.expectedResult
+                        }">
+                            Erwartetes Ergebnis
+                        </span>
+                    </div>
+
+                    <form class="result-form"
+                          method="post"
+                          th:action="@{
+                              /test-runs/{testRunId}/results/{executionId}
+                              (
+                                  testRunId=${testRun.id},
+                                  executionId=${execution.id}
+                              )
+                          }">
+
+                        <div class="form-group">
+                            <label th:for="|status-${execution.id}|">
+                                Ergebnisstatus
+                            </label>
+
+                            <select name="resultStatus"
+                                    th:id="|status-${execution.id}|">
+
+                                <option th:each="status : ${resultStatuses}"
+                                        th:value="${status}"
+                                        th:text="${status.displayName}"
+                                        th:selected="${
+                                            status ==
+                                            execution.resultStatus
+                                        }">
+                                    Status
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label th:for="|actual-${execution.id}|">
+                                Tatsächliches Ergebnis
+                            </label>
+
+                            <textarea name="actualResult"
+                                      th:id="|actual-${execution.id}|"
+                                      maxlength="2000"
+                                      rows="4"
+                                      placeholder="Beobachtetes Testergebnis eintragen"
+                                      th:text="${execution.actualResult}">
+                            </textarea>
+                        </div>
+
+                        <button class="button" type="submit">
+                            Ergebnis speichern
+                        </button>
+
+                    </form>
+                </article>
+
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Require4Testing – Prototyp zur Verwaltung von Softwaretests
+    </div>
+</footer>
+
+</body>
+</html>

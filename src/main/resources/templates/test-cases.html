@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testfälle | Require4Testing</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <div>
+            <a class="brand" th:href="@{/requirements}">
+                Require4Testing
+            </a>
+            <span class="subtitle">Testmanagement-Prototyp</span>
+        </div>
+
+        <nav class="main-nav" aria-label="Hauptnavigation">
+            <a th:href="@{/requirements}">
+                Anforderungen
+            </a>
+            <a class="active" th:href="@{/test-cases}">
+                Testfälle
+            </a>
+            <a th:href="@{/test-runs}">
+                Testläufe
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container page-content">
+    <section class="page-heading">
+        <p class="eyebrow">User Story 3</p>
+        <h1>Testfälle verwalten</h1>
+        <p>
+            Testfälle erfassen und einer vorhandenen Anforderung zuordnen.
+        </p>
+    </section>
+
+    <div class="content-grid">
+        <section class="card">
+            <h2>Neuen Testfall erfassen</h2>
+
+            <form th:action="@{/test-cases}"
+                  th:object="${testCase}"
+                  method="post">
+
+                <div class="form-group">
+                    <label for="title">Titel</label>
+                    <input id="title"
+                           type="text"
+                           th:field="*{title}"
+                           maxlength="120"
+                           required>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('title')}"
+                       th:errors="*{title}">
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Beschreibung</label>
+                    <textarea id="description"
+                              th:field="*{description}"
+                              maxlength="2000"
+                              rows="4"
+                              required>
+                    </textarea>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('description')}"
+                       th:errors="*{description}">
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="expectedResult">
+                        Erwartetes Ergebnis
+                    </label>
+
+                    <textarea id="expectedResult"
+                              th:field="*{expectedResult}"
+                              maxlength="2000"
+                              rows="4"
+                              required>
+                    </textarea>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('expectedResult')}"
+                       th:errors="*{expectedResult}">
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="requirementId">
+                        Zugehörige Anforderung
+                    </label>
+
+                    <select id="requirementId"
+                            name="requirementId"
+                            required>
+
+                        <option value="">
+                            Bitte auswählen
+                        </option>
+
+                        <option th:each="requirementItem : ${requirements}"
+                                th:value="${requirementItem.id}"
+                                th:text="${requirementItem.title}"
+                                th:selected="${selectedRequirementId != null
+                                    and selectedRequirementId == requirementItem.id}">
+                        </option>
+                    </select>
+
+                    <p class="error"
+                       th:if="${#fields.hasErrors('requirement')}"
+                       th:errors="*{requirement}">
+                    </p>
+                </div>
+
+                <button class="button" type="submit">
+                    Testfall speichern
+                </button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Gespeicherte Testfälle</h2>
+
+            <p class="empty-state"
+               th:if="${#lists.isEmpty(testCases)}">
+                Es wurden noch keine Testfälle erfasst.
+            </p>
+
+            <div class="table-wrapper"
+                 th:unless="${#lists.isEmpty(testCases)}">
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Titel</th>
+                        <th>Anforderung</th>
+                        <th>Erwartetes Ergebnis</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="item : ${testCases}">
+                        <td th:text="${item.id}"></td>
+                        <td th:text="${item.title}"></td>
+                        <td th:text="${item.requirement.title}"></td>
+                        <td th:text="${item.expectedResult}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Require4Testing – Prototyp zur Verwaltung von Softwaretests
+    </div>
+</footer>
+</body>
+</html>
